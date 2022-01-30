@@ -125,15 +125,12 @@ class TicketControl extends React.Component {
   // }
 
   // Code using Redux
-  handleEditingTicketInList = (ticketToEdit) => {
-    const { dispatch } = this.props;
-    const action = a.addTicket(ticketToEdit);
-    dispatch(action);
+  handleEditingTicketInList = () => {
     this.setState({
       editing: false,
-      selectedTicket: null,
+      selectedTicket: null
     });
-  };
+  }
 
   render() {
     let currentlyVisibleState = null;
