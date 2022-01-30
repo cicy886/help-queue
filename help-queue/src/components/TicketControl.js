@@ -101,11 +101,9 @@ class TicketControl extends React.Component {
 
   // Code using Redux
   handleDeletingTicket = (id) => {
-    const { dispatch } = this.props;
-    const action = a.deleteTicket(id);
-    dispatch(action);
-    this.setState({ selectedTicket: null });
-  };
+    this.props.firestore.delete({collection: 'tickets', doc: id});
+    this.setState({selectedTicket: null});
+  }
 
   handleEditClick = () => {
     console.log("handleEditClick reached!");
