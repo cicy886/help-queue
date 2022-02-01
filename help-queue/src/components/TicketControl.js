@@ -20,25 +20,25 @@ class TicketControl extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.waitTimeUpdateTimer = setInterval(
-      () => this.updateTicketElapsedWaitTime(),
-      60000
-    );
-  }
+  // componentDidMount() {
+  //   this.waitTimeUpdateTimer = setInterval(
+  //     () => this.updateTicketElapsedWaitTime(),
+  //     60000
+  //   );
+  // }
 
-  componentWillUnmount() {
-    clearInterval(this.waitTimeUpdateTimer);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.waitTimeUpdateTimer);
+  // }
 
-  updateTicketElapsedWaitTime = () => {
-    const { dispatch } = this.props;
-    Object.values(this.props.mainTicketList).forEach((ticket) => {
-      const newFormattedWaitTime = ticket.timeOpen.fromNow(true);
-      const action = a.updateTime(ticket.id, newFormattedWaitTime);
-      dispatch(action);
-    });
-  };
+  // updateTicketElapsedWaitTime = () => {
+  //   const { dispatch } = this.props;
+  //   Object.values(this.props.mainTicketList).forEach((ticket) => {
+  //     const newFormattedWaitTime = ticket.timeOpen.fromNow(true);
+  //     const action = a.updateTime(ticket.id, newFormattedWaitTime);
+  //     dispatch(action);
+  //   });
+  // };
 
   // Code before using Redux
   // handleAddingNewTicketToList = (newTicket) => {
@@ -123,12 +123,12 @@ class TicketControl extends React.Component {
   // }
 
   // Code using Redux
-  // handleEditingTicketInList = () => {
-  //   this.setState({
-  //     editing: false,
-  //     selectedTicket: null
-  //   });
-  // }
+  handleEditingTicketInList = () => {
+    this.setState({
+      editing: false,
+      selectedTicket: null
+    });
+  }
 
   render() {
     let currentlyVisibleState = null;
@@ -158,7 +158,7 @@ class TicketControl extends React.Component {
     } else {
       currentlyVisibleState = (
         <TicketList
-          ticketList={/*this.state.mainTicketList*/ this.props.mainTicketList}
+          // ticketList={/*this.state.mainTicketList*/ this.props.mainTicketList}
           onTicketSelection={this.handleChangingSelectedTicket}
         />
       );
@@ -174,13 +174,13 @@ class TicketControl extends React.Component {
 }
 
 TicketControl.propTypes = {
-  mainTicketList: PropTypes.object,
+  //mainTicketList: PropTypes.object,
   formVisibleOnPage: PropTypes.bool
 };
 
 const mapStateToProps = (state) => {
   return {
-    mainTicketList: state.mainTicketList,
+    //mainTicketList: state.mainTicketList,
     formVisibleOnPage: state.formVisibleOnPage,
   };
 };
