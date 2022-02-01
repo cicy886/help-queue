@@ -123,12 +123,12 @@ class TicketControl extends React.Component {
   // }
 
   // Code using Redux
-  handleEditingTicketInList = () => {
-    this.setState({
-      editing: false,
-      selectedTicket: null
-    });
-  }
+  // handleEditingTicketInList = () => {
+  //   this.setState({
+  //     editing: false,
+  //     selectedTicket: null
+  //   });
+  // }
 
   render() {
     let currentlyVisibleState = null;
