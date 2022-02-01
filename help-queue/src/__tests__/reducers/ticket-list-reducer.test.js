@@ -1,6 +1,6 @@
 import ticketListReducer from '../../reducers/ticket-list-reducer';
 import * as c from './../../actions/ActionTypes';
-import Moment from 'moment';
+//import Moment from 'moment';
 
 describe('ticketListReducer', () => {
 
