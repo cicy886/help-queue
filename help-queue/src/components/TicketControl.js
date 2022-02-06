@@ -6,6 +6,7 @@ import EditTicketForm from "./EditTicketForm";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import * as a from "./../actions";
+import { withFirestore, isLoaded } from 'react-redux-firebase';
 
 class TicketControl extends React.Component {
   constructor(props) {
@@ -19,25 +20,25 @@ class TicketControl extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.waitTimeUpdateTimer = setInterval(
-      () => this.updateTicketElapsedWaitTime(),
-      60000
-    );
-  }
+  // componentDidMount() {
+  //   this.waitTimeUpdateTimer = setInterval(
+  //     () => this.updateTicketElapsedWaitTime(),
+  //     60000
+  //   );
+  // }
 
-  componentWillUnmount() {
-    clearInterval(this.waitTimeUpdateTimer);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.waitTimeUpdateTimer);
+  // }
 
-  updateTicketElapsedWaitTime = () => {
-    const { dispatch } = this.props;
-    Object.values(this.props.mainTicketList).forEach((ticket) => {
-      const newFormattedWaitTime = ticket.timeOpen.fromNow(true);
-      const action = a.updateTime(ticket.id, newFormattedWaitTime);
-      dispatch(action);
-    });
-  };
+  // updateTicketElapsedWaitTime = () => {
+  //   const { dispatch } = this.props;
+  //   Object.values(this.props.mainTicketList).forEach((ticket) => {
+  //     const newFormattedWaitTime = ticket.timeOpen.fromNow(true);
+  //     const action = a.updateTime(ticket.id, newFormattedWaitTime);
+  //     dispatch(action);
+  //   });
+  // };
 
   // Code before using Redux
   // handleAddingNewTicketToList = (newTicket) => {
@@ -47,14 +48,11 @@ class TicketControl extends React.Component {
   //   }
 
   // Code using Redux
-  handleAddingNewTicketToList = (newTicket) => {
+  handleAddingNewTicketToList = () => {
     const { dispatch } = this.props;
-    const action = a.addTicket(newTicket);
+    const action = a.toggleForm();
     dispatch(action);
-    const action2 = a.toggleForm();
-    dispatch(action2);
-    // this.setState({formVisibleOnPage: false});
-  };
+  }
 
   handleClick = () => {
     if (this.state.selectedTicket != null) {
@@ -90,17 +88,22 @@ class TicketControl extends React.Component {
 
   // Code using Redux
   handleChangingSelectedTicket = (id) => {
-    const selectedTicket = this.props.mainTicketList[id];
-    this.setState({ selectedTicket: selectedTicket });
+    this.props.firestore.get({collection: 'tickets', doc: id}).then((ticket) => {
+      const firestoreTicket = {
+        names: ticket.get("names"),
+        location: ticket.get("location"),
+        issue: ticket.get("issue"),
+        id: ticket.id
+      }
+      this.setState({selectedTicket: firestoreTicket });
+    });
   };
 
   // Code using Redux
   handleDeletingTicket = (id) => {
-    const { dispatch } = this.props;
-    const action = a.deleteTicket(id);
-    dispatch(action);
-    this.setState({ selectedTicket: null });
-  };
+    this.props.firestore.delete({collection: 'tickets', doc: id});
+    this.setState({selectedTicket: null});
+  }
 
   handleEditClick = () => {
     console.log("handleEditClick reached!");
@@ -120,17 +123,30 @@ class TicketControl extends React.Component {
   // }
 
   // Code using Redux
-  handleEditingTicketInList = (ticketToEdit) => {
-    const { dispatch } = this.props;
-    const action = a.addTicket(ticketToEdit);
-    dispatch(action);
+  handleEditingTicketInList = () => {
     this.setState({
       editing: false,
-      selectedTicket: null,
+      selectedTicket: null
     });
-  };
+  }
 
   render() {
+    const auth = this.props.firebase.auth();
+  if (!isLoaded(auth)) {
+    return (
+      <React.Fragment>
+        <h1>Loading...</h1>
+      </React.Fragment>
+    )
+  }
+  if ((isLoaded(auth)) && (auth.currentUser == null)) {
+    return (
+      <React.Fragment>
+        <h1>You must be signed in to access the queue.</h1>
+      </React.Fragment>
+    )
+  } 
+  if ((isLoaded(auth)) && (auth.currentUser != null)) {
     let currentlyVisibleState = null;
     let buttonText = null;
     if (this.state.editing) {
@@ -158,12 +174,13 @@ class TicketControl extends React.Component {
     } else {
       currentlyVisibleState = (
         <TicketList
-          ticketList={/*this.state.mainTicketList*/ this.props.mainTicketList}
+          // ticketList={/*this.state.mainTicketList*/ this.props.mainTicketList}
           onTicketSelection={this.handleChangingSelectedTicket}
         />
       );
       buttonText = "Add Ticket";
     }
+
     return (
       <React.Fragment>
         {currentlyVisibleState}
@@ -171,20 +188,21 @@ class TicketControl extends React.Component {
       </React.Fragment>
     );
   }
+  }
 }
 
 TicketControl.propTypes = {
-  mainTicketList: PropTypes.object,
+  //mainTicketList: PropTypes.object,
   formVisibleOnPage: PropTypes.bool
 };
 
 const mapStateToProps = (state) => {
   return {
-    mainTicketList: state.mainTicketList,
+    //mainTicketList: state.mainTicketList,
     formVisibleOnPage: state.formVisibleOnPage,
   };
 };
 
 TicketControl = connect(mapStateToProps)(TicketControl);
 
-export default TicketControl;
+export default withFirestore(TicketControl);
